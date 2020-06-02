@@ -5,9 +5,9 @@ import os
 import cv2
 import face_helper
 import facs_helper
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 import joblib
+from sklearn.tree import DecisionTreeClassifier
 
 
 def get_emotion(filename):
@@ -36,7 +36,7 @@ class FacePrepare:
 
     def process(self):
         personName = "None"
-        neutralFeaturesUpper, neutralFeaturesLower = [], []
+        neutralFeatures = [], []
         for f in glob.glob(os.path.join(self.faceFolder, "*.tiff")):
             faceUtil = face_helper.faceUtil()
             print("Processing file: {}".format(f))
@@ -49,18 +49,14 @@ class FacePrepare:
                 vec, center, face_bool = faceUtil.get_vec(image)
                 if face_bool:
                     feat = facs_helper.facialActions(vec, image)
-                    neutralFeaturesUpper = feat.detectFeatures()
-                    neutralFeaturesLower = feat.detectLowerFeatures()
+                    neutralFeatures = feat.detectFeatures()
 
             image = cv2.imread(f)
             vec, center, face_bool = faceUtil.get_vec(image)
             if face_bool:
                 feat = facs_helper.facialActions(vec, image)
-                newFeaturesUpper = feat.detectFeatures()
-                newFeaturesLower = feat.detectLowerFeatures()
-                facialMotionUp = np.asarray(feat.UpperFaceFeatures(neutralFeaturesUpper, newFeaturesUpper))
-                facialMotionLow = np.asarray(feat.LowerFaceFeatures(neutralFeaturesLower, newFeaturesLower))
-                facialMotion = np.concatenate((facialMotionUp, facialMotionLow)).tolist()
+                newFeatures = feat.detectFeatures()
+                facialMotion = np.asarray(feat.FaceFeatures(neutralFeatures, newFeatures)).tolist()
                 self.images.append(facialMotion)
                 self.labels.append(emotion)
 
@@ -71,9 +67,9 @@ def main():
     faceFolder = FacePrepare()
     images, labels = faceFolder.process()
 
-    model = SVC(kernel="poly")
+    model = DecisionTreeClassifier()
     model.fit(images, labels)
-    joblib.dump(model, "model/svm_poly_model.sav")
+    joblib.dump(model, "model/decision_tree_model.sav")
     pred = model.predict(images)
     print(accuracy_score(labels, pred))
 

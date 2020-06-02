@@ -123,7 +123,13 @@ class facialActions:
             n_arc: Height from brim of nose to corner of nose.
             hl_0: Height of left eye from eyelid to eyelid.
             hr_0: Height of right eye from eyelid to eyelid.
-        
+            h1: Height of top lip from corner of mouth.
+            h2: Height of bottom lip from corner of mouth.
+            w: Width of mouth from corner to corner of lips.
+            D_ell:  Height from left eye to left corner of mouth.
+            D_r: Height from right eye to right corner of mouth.
+            D_top: Height of top lip to bridge of nose.
+            D_b: Height of bottom lip to bridge of nose.
         """
         D = abs(self.brow_r[0, 0] - self.brow_ell[4, 0])  # distance between eyebrows
         blo = abs((self.brow_ell[0, 1] + self.brow_ell[1, 1]) / 2 - self.eye_ell[
@@ -153,24 +159,6 @@ class facialActions:
         hr_0 = abs((self.eye_r[1, 1] + self.eye_r[2, 1]) / 2 - (
                 self.eye_r[4, 1] + self.eye_r[5, 1]) / 2)  # Height of right eye from eyelid to eyelid
 
-        self.newFeatures = [D, blo, bli, bro, bri, hl1, hr1, hl2, hr2, self.furrow, self.wrinkle_ell, self.wrinkle_r,
-                            bl, br, n_arc, hl_0, hr_0, self.brow_ri, self.brow_li, self.brow_ro, self.brow_lo, hl3, hr3]
-        return self.newFeatures
-
-    def detectLowerFeatures(self):
-        """Get features of lower face. Features are distance of between key landmarks.
-        
-        Returns:
-            h1: Height of top lip from corner of mouth.
-            h2: Height of bottom lip from corner of mouth.
-            w: Width of mouth from corner to corner of lips. 
-            D_ell:  Height from left eye to left corner of mouth.
-            D_r: Height from right eye to right corner of mouth.
-            D_top: Height of top lip to bridge of nose.
-            D_b: Height of bottom lip to bridge of nose. 
-            
-        """
-
         h1 = abs(
             self.lip_tu[3, 1] - (self.lip_tu[0, 1] + self.lip_bl[0, 1]) / 2)  # Height of top lip from corner of mouth
         h2 = abs(self.lip_bl[3, 1] - (
@@ -181,10 +169,13 @@ class facialActions:
         D_top = abs(self.lip_tu[3, 1] - self.nose_line[0, 1])  # Height of top lip to bridge of nose.
         D_b = abs(self.lip_bl[3, 1] - self.nose_line[0, 1])  # Height of bottom lip to bridge of nose.
 
-        self.newLowerFeatures = [h1, h2, w, D_ell, D_r, D_top, D_b]
-        return self.newLowerFeatures
+        self.newFeatures = [D, blo, bli, bro, bri, hl1, hr1, hl2, hr2, self.furrow, self.wrinkle_ell, self.wrinkle_r,
+                            bl, br, n_arc, hl_0, hr_0, self.brow_ri, self.brow_li, self.brow_ro, self.brow_lo, hl3, hr3,
+                            h1, h2, w, D_ell, D_r, D_top, D_b]
+        return self.newFeatures
 
-    def UpperFaceFeatures(self, old, new):
+    @staticmethod
+    def FaceFeatures(old, new):
         """Motion of upper facial features comparing new frame to old frame.
         
         Not all values are returned for the robot. Canny edges, due to lighting, 
@@ -236,56 +227,7 @@ class facialActions:
         r_hr2 = - (new[8] - old[8]) / (old[8])  # hr2
         r_el = ((new[5] + new[7]) - (old[5] + old[7])) / (old[5] + old[7])  # left eye height
         r_er = ((new[6] + new[8]) - (old[6] + old[8])) / (old[6] + old[8])  # right eye height
-        r_furrow = (new[9] - old[9]) / (old[9] + 1)  # furrow
-        r_wrinkle_ell = (new[10] - old[10]) / (old[10] + 1)  # wrinkle left eye outer corner
-        r_wrinkle_r = (new[11] - old[11]) / (old[11] + 1)  # wrinkle right eye outer corner
 
-        r_bl = (new[12] - old[12]) / (old[12])  # bl
-        r_br = (new[13] - old[13]) / (old[13])  # br
-        r_n_arc = (new[14] - old[14]) / (old[14])  # n_arc
-        r_hl_0 = (new[15] - old[15]) / (old[15])  # hl_0
-        r_hr_0 = (new[16] - old[16]) / (old[16])  # hr_0
-
-        r_brow_ri = (new[17] - old[17]) / (old[17] + 1)  # wrinkle above inner right eyebrow
-        r_brow_li = (new[18] - old[18]) / (old[18] + 1)  # wrinkle above inner left eyebrow
-        r_brow_ro = (new[19] - old[19]) / (old[19] + 1)  # wrinkle above outer right eyebrow
-        r_brow_lo = (new[20] - old[20]) / (old[20] + 1)  # wrinkle about outer left eyebrow
-
-        r_hl3 = (new[21] - old[21]) / old[21]
-        r_hr3 = (new[22] - old[22]) / old[22]
-
-        # If you want to use different input parameters for the neural network of top facial features, change the
-        # output of this function.
-
-        # #        return D_brow, r_blo, r_bli, r_bro, r_bri, r_hl1, r_hr1, r_hl2, r_hr2, r_el,r_er,r_bl, r_br,
-        # r_n_arc, r_hl_0, r_hr_0,  r_furrow, r_wrinkle_ell, r_wrinkle_r, r_brow_ri, r_brow_li, r_brow_ro, r_brow_lo,
-        # r_hl3, r_hr3 #        return D_brow, r_blo, r_bli, r_bro, r_bri, r_hl1, r_hr1, r_hl2, r_hr2, r_el,r_er,
-        # r_bl, r_br, r_n_arc, r_hl_0, r_hr_0,  r_furrow, r_wrinkle_ell, r_wrinkle_r
-        return D_brow, r_blo, r_bli, r_bro, r_bri, r_hl1, r_hr1, r_hl2, r_hr2, r_el, r_er
-
-    def LowerFaceFeatures(self, old, new):
-        """Motion of lower facial features comparing new frame to old frame.
-        
-        Note that all displacements over time are scaled by the initial neutral position.
-        This attempts to keep the analysis consistent for analyzing faces of different
-        size and keeping the analysis scale invariant when the face is closer or farther away.
-        It works okay, but the distance of the face does matter because the CK+ database
-        provides faces all at the same distance from the camera. 
-        
-        Args: 
-            old: Lower facial features of single frame from function detectLowerFeatures.
-            new: Lower facial features of single frame from function detectLowerFeatures. 
-        
-        Returns:
-            r_h (float): Change in lip height.
-            r_w (float): Change in lip width. 
-            r_ell (float):  Change in height of left lip corner to nose. 
-            r_r (float): Change in height of right lip corner to nose.
-            r_top (float): Change in height of top lip to bridge of nose.
-            r_btm (float): Change in height of bottom lip to bridge of nose.      
-        """
-
-        # [h1,h2,w,D_ell, D_r, D_top, D_b]
         r_h = ((new[0] + new[1]) - (old[0] + old[1])) / (old[0] + old[1])  # lip height
         r_w = (new[2] - old[2]) / old[2]  # lip width
         r_ell = - (new[3] - old[3]) / old[3]  # left lip corner height to nose
@@ -293,7 +235,7 @@ class facialActions:
         r_top = - (new[5] - old[5]) / old[5]  # top lip height to nose
         r_btm = - (new[6] - old[6]) / old[6]  # bottom lip height to nose
 
-        return r_h, r_w, r_ell, r_r, r_top, r_btm
+        return D_brow, r_blo, r_bli, r_bro, r_bri, r_hl1, r_hr1, r_hl2, r_hr2, r_el, r_er, r_h, r_w, r_ell, r_r, r_top, r_btm
 
     def checkProfile(self, tol):
         """Check that face is looking straight-on at camera.

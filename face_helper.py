@@ -14,8 +14,7 @@ class faceUtil:
         detector: Dlib facial detector. Returns location of face.
         predictor: Gets 68 landmarks of detected face.
         vec (int): Holds landmarks of detected face. 
-        neutralFeaturesUpper (float): Neutral facial features of upper face.
-        neutralFeaturesLower (float): Neutral facial features of lower face.
+        neutralFeatures (float): Neutral facial features of face.
     """
 
     def __init__(self):
@@ -23,25 +22,20 @@ class faceUtil:
         self.detector = dlib.get_frontal_face_detector()
         self.predictor = dlib.shape_predictor(self.predictor_path)
         self.vec = np.empty([68, 2], dtype=int)
-        self.neutralFeaturesUpper = []
-        self.neutralFeaturesLower = []
+        self.neutralFeatures = []
 
-    def get_vec(self, image, centerFixed=None, face_bool=None):
+    def get_vec(self, image):
         """Get facial landmarks of face.
         
         Returns:
             vec (int): 68 landmarks of face.
             center (int): Coordinates of center of face.
             face_bool (bool): True if face detected. Otherwise, false."""
-        dets = self.detector(image, 1)  # dets includes rectangle coordinates of face
+        detector = self.detector(image, 1)  # detector includes rectangle coordinates of face
         center = []  # Center coordinates of face.
-        if np.any(dets):
+        if np.any(detector):
             face_bool = True
-            for k, d in enumerate(dets):
-                ## For troubleshooting
-                ##        print("Detection {}: Left: {} Top: {} Right: {} Bottom: {}".format(
-                ##            k, d.left(), d.top(), d.right(), d.bottom()))
-                # Get the landmarks/parts for the face in box d.
+            for k, d in enumerate(detector):
                 shape = self.predictor(image, d)
                 # Populate facial landmarks.
                 for i in range(shape.num_parts):
@@ -61,7 +55,7 @@ class faceUtil:
             face_bool = False
         return self.vec, center, face_bool
 
-    def set_neutral(self, feat, newFeaturesUpper, newFeaturesLower, neutralBool, tol):
+    def set_neutral(self, feat, newFeatures, neutralBool, tol):
         """Set neutral expression of detected face.
         
         In this script, facial emotion is detected based on displacement from 
@@ -70,6 +64,7 @@ class faceUtil:
         for the facial actions to be detected properly.
         
         Args:
+            neutralBool: Set neutral face or not 
             feat: Class for analyzing facial features. Used for checking face looks at camera.
             newFeaturesUpper (int): Facial features, candidates upper neutral expression. 
             newFeaturesLower (int): Facial features, candidates for lower neutral expression.
@@ -83,14 +78,13 @@ class faceUtil:
         if not neutralBool:
             jawBool, eyeBool = feat.checkProfile(tol)  # Check if the face is looking directly at the camera.
             if jawBool and eyeBool:
-                self.neutralFeaturesUpper = newFeaturesUpper
-                self.neutralFeaturesLower = newFeaturesLower
+                self.neutralFeatures = newFeatures
                 neutralBool = True
-        return neutralBool, self.neutralFeaturesUpper, self.neutralFeaturesLower
+        return neutralBool, self.neutralFeatures
 
     def face_detect(self, image, face_bool):
         """Check if face is detected."""
-        dets = self.detector(image, 1)  # dets includes rectangle coordinates of face
-        if np.any(dets):
+        detector = self.detector(image, 1)  # detector includes rectangle coordinates of face
+        if np.any(detector):
             face_bool = True
         return face_bool
