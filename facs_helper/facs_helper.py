@@ -3,9 +3,6 @@
 
 __name__ = 'facs_helper'
 
-import glob
-import os
-
 import cv2
 import numpy as np
 

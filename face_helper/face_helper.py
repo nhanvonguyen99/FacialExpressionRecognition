@@ -18,7 +18,7 @@ class faceUtil:
     """
 
     def __init__(self):
-        self.predictor_path = 'shape_predictor_68_face_landmarks.dat'
+        self.predictor_path = './face_helper/shape_predictor_68_face_landmarks.dat'
         self.detector = dlib.get_frontal_face_detector()
         self.predictor = dlib.shape_predictor(self.predictor_path)
         self.vec = np.empty([68, 2], dtype=int)
@@ -66,8 +66,7 @@ class faceUtil:
         Args:
             neutralBool: Set neutral face or not 
             feat: Class for analyzing facial features. Used for checking face looks at camera.
-            newFeaturesUpper (int): Facial features, candidates upper neutral expression. 
-            newFeaturesLower (int): Facial features, candidates for lower neutral expression.
+            newFeatures: Facial features, candidates neutral expression.
             tol (int): Tolerance for how much head may be turned from straight-on portrait.
         
         Returns:

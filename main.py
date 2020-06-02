@@ -5,13 +5,21 @@ import face_helper
 import facs_helper
 from imutils.video import VideoStream
 import joblib
+import argparse
 
 
 def main():
+    ap = argparse.ArgumentParser()
+
+    ap.add_argument("-m", "--model", type=int, default=0,
+                    help="Model selection: 0: SVM 1: Gaussian naive bayes other: Decision tree")
+
+    args = vars(ap.parse_args())
+
     # Label Facial Action Units (AUs) and Basic Emotions.
     global neutralFeatures
 
-    dict_emotion = ["Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise", "Neutral"]
+    dict_emotion = ["Thinking...", "Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise"]
 
     # Font size for text on video
     font_size = 0.6
@@ -35,7 +43,13 @@ def main():
     pos_emotion = (np.arange(25, 225, 25) * scaleUp).astype(int)
 
     # SVM model path.
-    load_file = 'model/decision_tree_model.sav'
+    model_selection = args["model"]
+    if model_selection == 0:
+        load_file = 'model/svm_linear_model.sav'
+    elif model_selection == 1:
+        load_file = "model/gaussian_naive_bayes_model.sav"
+    else:
+        load_file = "model/decision_tree_model.sav"
 
     # SVM model
     model = joblib.load(load_file)
