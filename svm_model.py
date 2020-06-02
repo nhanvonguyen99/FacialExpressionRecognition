@@ -8,6 +8,7 @@ import facs_helper
 from sklearn.metrics import accuracy_score
 import joblib
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.naive_bayes import GaussianNB
 
 
 def get_emotion(filename):
@@ -46,12 +47,14 @@ class FacePrepare:
                 personName = currentPersonName
                 neutralImagePath = f[:11] + "NE" + ".tiff"
                 image = cv2.imread(neutralImagePath)
+                image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
                 vec, center, face_bool = faceUtil.get_vec(image)
                 if face_bool:
                     feat = facs_helper.facialActions(vec, image)
                     neutralFeatures = feat.detectFeatures()
 
             image = cv2.imread(f)
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
             vec, center, face_bool = faceUtil.get_vec(image)
             if face_bool:
                 feat = facs_helper.facialActions(vec, image)
@@ -64,12 +67,16 @@ class FacePrepare:
 
 
 def main():
-    faceFolder = FacePrepare()
-    images, labels = faceFolder.process()
-
+    # faceFolder = FacePrepare()
+    # images, labels = faceFolder.process()
+    # joblib.dump(images, "model/images.sav")
+    # joblib.dump(labels, "model/labels.sav")
+    images = joblib.load("model/images.sav")
+    labels = joblib.load("model/labels.sav")
+    
     model = DecisionTreeClassifier()
     model.fit(images, labels)
-    joblib.dump(model, "model/decision_tree_model.sav")
+    joblib.dump(model, "model/svm_poly_model.sav")
     pred = model.predict(images)
     print(accuracy_score(labels, pred))
 

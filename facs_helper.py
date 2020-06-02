@@ -228,12 +228,12 @@ class facialActions:
         r_el = ((new[5] + new[7]) - (old[5] + old[7])) / (old[5] + old[7])  # left eye height
         r_er = ((new[6] + new[8]) - (old[6] + old[8])) / (old[6] + old[8])  # right eye height
 
-        r_h = ((new[0] + new[1]) - (old[0] + old[1])) / (old[0] + old[1])  # lip height
-        r_w = (new[2] - old[2]) / old[2]  # lip width
-        r_ell = - (new[3] - old[3]) / old[3]  # left lip corner height to nose
-        r_r = - (new[4] - old[4]) / old[4]  # right lip corner height to nose
-        r_top = - (new[5] - old[5]) / old[5]  # top lip height to nose
-        r_btm = - (new[6] - old[6]) / old[6]  # bottom lip height to nose
+        r_h = ((new[23] + new[24]) - (old[23] + old[24])) / (old[23] + old[24])  # lip height
+        r_w = (new[25] - old[25]) / old[25]  # lip width
+        r_ell = - (new[26] - old[26]) / old[26]  # left lip corner height to nose
+        r_r = - (new[27] - old[27]) / old[27]  # right lip corner height to nose
+        r_top = - (new[28] - old[28]) / old[28]  # top lip height to nose
+        r_btm = - (new[29] - old[29]) / old[29]  # bottom lip height to nose
 
         return D_brow, r_blo, r_bli, r_bro, r_bri, r_hl1, r_hr1, r_hl2, r_hr2, r_el, r_er, r_h, r_w, r_ell, r_r, r_top, r_btm
 

@@ -35,7 +35,7 @@ def main():
     pos_emotion = (np.arange(25, 225, 25) * scaleUp).astype(int)
 
     # SVM model path.
-    load_file = 'model/svm_poly_model.sav'
+    load_file = 'model/decision_tree_model.sav'
 
     # SVM model
     model = joblib.load(load_file)
@@ -49,15 +49,14 @@ def main():
     emotion = 6
     # loop over the frames from the video stream
     while True:
-        face_bool = True
         frame = vs.read()
-
-        small_frame = cv2.resize(frame, (0, 0), fx=scaleFactor, fy=scaleFactor)
+        small_frame = cv2.resize(frame, (256, 256))
+        gray = cv2.cvtColor(small_frame, cv2.COLOR_BGR2GRAY)
         # Get facial landmarks and position of face on image.
-        vec, point, face_bool = face_op.get_vec(small_frame)
+        vec, point, face_bool = face_op.get_vec(gray)
         if face_bool:
             # Get facial features.
-            feat = facs_helper.facialActions(vec, small_frame)
+            feat = facs_helper.facialActions(vec, gray)
             newFeatures = feat.detectFeatures()
             if not neutralBool:
                 neutralBool, neutralFeatures \
