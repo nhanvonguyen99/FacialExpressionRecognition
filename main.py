@@ -28,9 +28,6 @@ def main():
     # Initialize Dlib
     face_op = face_helper.faceUtil()
 
-    # Facial landmarks
-    vec = np.empty([68, 2], dtype=int)
-
     tol = 5 # Tolerance for setting neutral expression profile. Verifies eye and ear separation
 
     # Reduces images size for image processing.
@@ -51,7 +48,7 @@ def main():
     else:
         load_file = "model/decision_tree_model.sav"
 
-    # SVM model
+    # model
     model = joblib.load(load_file)
 
     # initialize the video stream and allow the camera sensor to warn up
