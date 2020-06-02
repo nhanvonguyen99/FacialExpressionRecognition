@@ -80,11 +80,12 @@ def main():
         frame = vs.read()
         # Get facial landmarks and position of face on image.
         face_bool = False
-        small_frame = cv2.resize(frame, (0, 0), fx=scaleFactor, fy=scaleFactor)
-        vec, point, face_bool = face_op.get_vec(small_frame)
+        small_frame = cv2.resize(frame, (256, 256))
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        vec, point, face_bool = face_op.get_vec(gray)
         if face_bool:
             # Get facial features.
-            feat = facs_helper.facialActions(vec, small_frame)
+            feat = facs_helper.facialActions(vec, gray)
             newFeaturesUpper = feat.detectUpperFeatures()
             newFeaturesLower = feat.detectLowerFeatures()
             if not neutralBool:
