@@ -49,7 +49,8 @@ class facialActions:
         dist_eye = 10
         dist_shift = 10
         dist_shift_brow = 10
-        self.newFeatures = []
+        self.newUpperFeatures = []
+        self.newLowerFeatures = []
 
         # Declare key facial distances, ell means left, r is for right, u is for upper, b is for bottom
         # u is for upper, l is for lower, i is for inner, and o is for outer.
@@ -99,11 +100,11 @@ class facialActions:
         self.brow_ro = np.sum((0 if canny_brow_ro is None else canny_brow_ro) / 255) / dist ** 2
         self.brow_lo = np.sum((0 if canny_brow_lo is None else canny_brow_lo) / 255) / dist ** 2
 
-    def detectFeatures(self):
+    def detectUpperFeatures(self):
         """Get upper facial features, which are displacements over time of facial landmarks.
         Refer to https://www.pyimagesearch.com/2017/04/10/detect-eyes-nose-lips-jaw-dlib-opencv-python/
-        
-        Returns: 
+
+        Returns:
             D: Distance between eyebrows.
             blo: Height between outer corner of left eye and outer left eyebrow.
             bli: Height between inner corner of left eye and inner left eyebrow.
@@ -120,13 +121,7 @@ class facialActions:
             n_arc: Height from brim of nose to corner of nose.
             hl_0: Height of left eye from eyelid to eyelid.
             hr_0: Height of right eye from eyelid to eyelid.
-            h1: Height of top lip from corner of mouth.
-            h2: Height of bottom lip from corner of mouth.
-            w: Width of mouth from corner to corner of lips.
-            D_ell:  Height from left eye to left corner of mouth.
-            D_r: Height from right eye to right corner of mouth.
-            D_top: Height of top lip to bridge of nose.
-            D_b: Height of bottom lip to bridge of nose.
+
         """
         D = abs(self.brow_r[0, 0] - self.brow_ell[4, 0])  # distance between eyebrows
         blo = abs((self.brow_ell[0, 1] + self.brow_ell[1, 1]) / 2 - self.eye_ell[
@@ -156,6 +151,26 @@ class facialActions:
         hr_0 = abs((self.eye_r[1, 1] + self.eye_r[2, 1]) / 2 - (
                 self.eye_r[4, 1] + self.eye_r[5, 1]) / 2)  # Height of right eye from eyelid to eyelid
 
+        self.newUpperFeatures = [D, blo, bli, bro, bri, hl1, hr1, hl2, hr2, self.furrow, self.wrinkle_ell,
+                                 self.wrinkle_r,
+                                 bl, br, n_arc, hl_0, hr_0, self.brow_ri, self.brow_li, self.brow_ro, self.brow_lo, hl3,
+                                 hr3]
+        return self.newUpperFeatures
+
+    def detectLowerFeatures(self):
+        """Get features of lower face. Features are distance of between key landmarks.
+
+        Returns:
+            h1: Height of top lip from corner of mouth.
+            h2: Height of bottom lip from corner of mouth.
+            w: Width of mouth from corner to corner of lips.
+            D_ell:  Height from left eye to left corner of mouth.
+            D_r: Height from right eye to right corner of mouth.
+            D_top: Height of top lip to bridge of nose.
+            D_b: Height of bottom lip to bridge of nose.
+
+        """
+
         h1 = abs(
             self.lip_tu[3, 1] - (self.lip_tu[0, 1] + self.lip_bl[0, 1]) / 2)  # Height of top lip from corner of mouth
         h2 = abs(self.lip_bl[3, 1] - (
@@ -166,53 +181,51 @@ class facialActions:
         D_top = abs(self.lip_tu[3, 1] - self.nose_line[0, 1])  # Height of top lip to bridge of nose.
         D_b = abs(self.lip_bl[3, 1] - self.nose_line[0, 1])  # Height of bottom lip to bridge of nose.
 
-        self.newFeatures = [D, blo, bli, bro, bri, hl1, hr1, hl2, hr2, self.furrow, self.wrinkle_ell, self.wrinkle_r,
-                            bl, br, n_arc, hl_0, hr_0, self.brow_ri, self.brow_li, self.brow_ro, self.brow_lo, hl3, hr3,
-                            h1, h2, w, D_ell, D_r, D_top, D_b]
-        return self.newFeatures
+        self.newLowerFeatures = [h1, h2, w, D_ell, D_r, D_top, D_b]
+        return self.newLowerFeatures
 
     @staticmethod
-    def FaceFeatures(old, new):
+    def UpperFaceFeatures(old, new):
         """Motion of upper facial features comparing new frame to old frame.
-        
-        Not all values are returned for the robot. Canny edges, due to lighting, 
-        were disrupting results. Performance on faces in the wild 
-        improved with fewer arguments.
-        
-        Note that all displacements over time are scaled by the initial neutral position.
-        This attempts to keep the analysis consistent for analyzing faces of different
-        size and keeping the analysis scale invariant when the face is closer or farther away.
-        It works okay, but the distance of the face does matter because the CK+ database
-        provides faces all at the same distance from the camera. 
-        
-        Args:
-            old: Upper static facial features from function detectFeatures.
-            new: Upper static facial features from function detectFeatures.
-        
-        Returns:
-            (all floats)
-            r_D: Change in Distance between eyebrows.
-            r_blo: Change in height between outer corner of left eye and outer left eyebrow.
-            r_bli: Change in height between inner corner of left eye and inner left eyebrow.
-            r_bri: Change in height between outer corner of right eye and outer right eyebrow.
-            r_bro: Change in height between inner corner of right eye and inner right eyebrow.
-            r_hl1: Change in height of top left eyelid from pupil.
-            r_hr1: Change in height of top right eyelid from pupil.
-            r_hl2: Change in height of bottom left eyelid from pupil.
-            r_hr2: Change in height of bottom right eyelid from pupil.
-            r_hl3: Change in height of bottom left eyelid from pupil.
-            r_hr3: Change in height of bottom right eyelid from pupil.
-            r_el: Change in left eye height. 
-            r_er: Change in right eye height. 
-            r_furrow: Change in density of lines from canny edges between brows. 
-            r_wrinkle_ell: Change in density left of left eye. 
-            r_wrinkle_r: Change in density right of right eye. 
-            r_bl: Change in distance from top left eyebrow to brim of nose.
-            r_br: Change in distance from top right eyebrow to brim of nose.
-            r_n_arc: Change in height from brim of nose to corner of nose.
-            r_hl_0: Change in height of left eye from eyelid to eyelid.
-            r_hr_0: Change in height of right eye from eyelid to eyelid.
-        """
+
+            Not all values are returned for the robot. Canny edges, due to lighting,
+            were disrupting results. Performance on faces in the wild
+            improved with fewer arguments.
+
+            Note that all displacements over time are scaled by the initial neutral position.
+            This attempts to keep the analysis consistent for analyzing faces of different
+            size and keeping the analysis scale invariant when the face is closer or farther away.
+            It works okay, but the distance of the face does matter because the CK+ database
+            provides faces all at the same distance from the camera.
+
+            Args:
+                old: Upper static facial features from function detectFeatures.
+                new: Upper static facial features from function detectFeatures.
+
+            Returns:
+                (all floats)
+                r_D: Change in Distance between eyebrows.
+                r_blo: Change in height between outer corner of left eye and outer left eyebrow.
+                r_bli: Change in height between inner corner of left eye and inner left eyebrow.
+                r_bri: Change in height between outer corner of right eye and outer right eyebrow.
+                r_bro: Change in height between inner corner of right eye and inner right eyebrow.
+                r_hl1: Change in height of top left eyelid from pupil.
+                r_hr1: Change in height of top right eyelid from pupil.
+                r_hl2: Change in height of bottom left eyelid from pupil.
+                r_hr2: Change in height of bottom right eyelid from pupil.
+                r_hl3: Change in height of bottom left eyelid from pupil.
+                r_hr3: Change in height of bottom right eyelid from pupil.
+                r_el: Change in left eye height.
+                r_er: Change in right eye height.
+                r_furrow: Change in density of lines from canny edges between brows.
+                r_wrinkle_ell: Change in density left of left eye.
+                r_wrinkle_r: Change in density right of right eye.
+                r_bl: Change in distance from top left eyebrow to brim of nose.
+                r_br: Change in distance from top right eyebrow to brim of nose.
+                r_n_arc: Change in height from brim of nose to corner of nose.
+                r_hl_0: Change in height of left eye from eyelid to eyelid.
+                r_hr_0: Change in height of right eye from eyelid to eyelid.
+            """
         D_brow = (new[0] - old[0]) / (old[0])  # D
         r_blo = (new[1] - old[1]) / (old[1])  # blo
         r_bli = (new[2] - old[2]) / (old[2])  # bli
@@ -225,14 +238,43 @@ class facialActions:
         r_el = ((new[5] + new[7]) - (old[5] + old[7])) / (old[5] + old[7])  # left eye height
         r_er = ((new[6] + new[8]) - (old[6] + old[8])) / (old[6] + old[8])  # right eye height
 
-        r_h = ((new[23] + new[24]) - (old[23] + old[24])) / (old[23] + old[24])  # lip height
-        r_w = (new[25] - old[25]) / old[25]  # lip width
-        r_ell = - (new[26] - old[26]) / old[26]  # left lip corner height to nose
-        r_r = - (new[27] - old[27]) / old[27]  # right lip corner height to nose
-        r_top = - (new[28] - old[28]) / old[28]  # top lip height to nose
-        r_btm = - (new[29] - old[29]) / old[29]  # bottom lip height to nose
+        # If you want to use different input parameters for the neural network of top facial features, change the
+        # output of this function.
 
-        return D_brow, r_blo, r_bli, r_bro, r_bri, r_hl1, r_hr1, r_hl2, r_hr2, r_el, r_er, r_h, r_w, r_ell, r_r, r_top, r_btm
+        return D_brow, r_blo, r_bli, r_bro, r_bri, r_hl1, r_hr1, r_hl2, r_hr2, r_el, r_er
+
+    @staticmethod
+    def LowerFaceFeatures(old, new):
+        """Motion of lower facial features comparing new frame to old frame.
+
+        Note that all displacements over time are scaled by the initial neutral position.
+        This attempts to keep the analysis consistent for analyzing faces of different
+        size and keeping the analysis scale invariant when the face is closer or farther away.
+        It works okay, but the distance of the face does matter because the CK+ database
+        provides faces all at the same distance from the camera.
+
+        Args:
+            old: Lower facial features of single frame from function detectLowerFeatures.
+            new: Lower facial features of single frame from function detectLowerFeatures.
+
+        Returns:
+            r_h (float): Change in lip height.
+            r_w (float): Change in lip width.
+            r_ell (float):  Change in height of left lip corner to nose.
+            r_r (float): Change in height of right lip corner to nose.
+            r_top (float): Change in height of top lip to bridge of nose.
+            r_btm (float): Change in height of bottom lip to bridge of nose.
+        """
+
+        # [h1,h2,w,D_ell, D_r, D_top, D_b]
+        r_h = ((new[0] + new[1]) - (old[0] + old[1])) / (old[0] + old[1])  # lip height
+        r_w = (new[2] - old[2]) / old[2]  # lip width
+        r_ell = - (new[3] - old[3]) / old[3]  # left lip corner height to nose
+        r_r = - (new[4] - old[4]) / old[4]  # right lip corner height to nose
+        r_top = - (new[5] - old[5]) / old[5]  # top lip height to nose
+        r_btm = - (new[6] - old[6]) / old[6]  # bottom lip height to nose
+
+        return r_h, r_w, r_ell, r_r, r_top, r_btm
 
     def checkProfile(self, tol):
         """Check that face is looking straight-on at camera.

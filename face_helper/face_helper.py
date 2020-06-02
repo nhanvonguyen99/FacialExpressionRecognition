@@ -14,7 +14,8 @@ class faceUtil:
         detector: Dlib facial detector. Returns location of face.
         predictor: Gets 68 landmarks of detected face.
         vec (int): Holds landmarks of detected face. 
-        neutralFeatures (float): Neutral facial features of face.
+        neutralFeaturesUpper (float): Neutral facial features of upper face.
+        neutralFeaturesLower (float): Neutral facial features of lower face.
     """
 
     def __init__(self):
@@ -22,7 +23,8 @@ class faceUtil:
         self.detector = dlib.get_frontal_face_detector()
         self.predictor = dlib.shape_predictor(self.predictor_path)
         self.vec = np.empty([68, 2], dtype=int)
-        self.neutralFeatures = []
+        self.neutralFeaturesUpper = []
+        self.neutralFeaturesLower = []
 
     def get_vec(self, image):
         """Get facial landmarks of face.
@@ -55,20 +57,20 @@ class faceUtil:
             face_bool = False
         return self.vec, center, face_bool
 
-    def set_neutral(self, feat, newFeatures, neutralBool, tol):
+    def set_neutral(self, feat, newFeaturesUpper, newFeaturesLower, neutralBool, tol):
         """Set neutral expression of detected face.
-        
-        In this script, facial emotion is detected based on displacement from 
-        a neutral facial position to an emotional position. The subject must 
+
+        In this script, facial emotion is detected based on displacement from
+        a neutral facial position to an emotional position. The subject must
         initialize the robot with their neutral or blank facial expression
         for the facial actions to be detected properly.
-        
+
         Args:
-            neutralBool: Set neutral face or not 
             feat: Class for analyzing facial features. Used for checking face looks at camera.
-            newFeatures: Facial features, candidates neutral expression.
+            newFeaturesUpper (int): Facial features, candidates upper neutral expression.
+            newFeaturesLower (int): Facial features, candidates for lower neutral expression.
             tol (int): Tolerance for how much head may be turned from straight-on portrait.
-        
+
         Returns:
             neutralBool: True if face is looking directly at the camera. False, otherwise.
             neutralFeaturesUpper (float): Neutral facial features of upper face.
@@ -77,9 +79,10 @@ class faceUtil:
         if not neutralBool:
             jawBool, eyeBool = feat.checkProfile(tol)  # Check if the face is looking directly at the camera.
             if jawBool and eyeBool:
-                self.neutralFeatures = newFeatures
+                self.neutralFeaturesUpper = newFeaturesUpper
+                self.neutralFeaturesLower = newFeaturesLower
                 neutralBool = True
-        return neutralBool, self.neutralFeatures
+        return neutralBool, self.neutralFeaturesUpper, self.neutralFeaturesLower
 
     def face_detect(self, image, face_bool):
         """Check if face is detected."""
