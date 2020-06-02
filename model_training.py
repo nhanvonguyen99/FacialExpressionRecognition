@@ -9,7 +9,7 @@ import joblib
 from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.multiclass import OneVsRestClassifier
 
-facsTop = [1., 2., 4., 5., 6., 7.]
+facsTop = np.array([1., 2., 4., 5., 6., 7.])
 facsBtm = np.array([9., 10., 12., 15., 16., 20., 23., 24., 25., 26., 27.])
 
 
@@ -39,7 +39,7 @@ def get_lower_aus(filename):
     elif emotion == "FE":
         return [3]
     elif emotion == "AN":
-        return [5]
+        return [6]
     elif emotion == "DI":
         return [3, 4]
     return [-1]
@@ -111,7 +111,7 @@ def main():
     joblib.dump(upper_face_classes, "data_save/upper_face_classes.sav")
     joblib.dump(lower_face_classes, "data_save/lower_face_classes.sav")
 
-    subClf = SVC(kernel="poly")
+    subClf = SVC(kernel="linear")
     clf = OneVsRestClassifier(estimator=subClf)
     clf.fit(lower_face_features, lower_face_labels)
 
