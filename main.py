@@ -73,7 +73,6 @@ def main():
                 neutralBool, neutralFeatures \
                     = face_op.set_neutral(feat, newFeatures, neutralBool, tol)
             else:
-                # Just reshape variables.
                 facialMotion = np.asarray(feat.FaceFeatures(neutralFeatures, newFeatures)).tolist()
                 emotion = model.predict([facialMotion])[0]
 
