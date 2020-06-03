@@ -62,12 +62,11 @@ def main():
     while True:
         frame = vs.read()
         small_frame = cv2.resize(frame, (256, 256))
-        gray = cv2.cvtColor(small_frame, cv2.COLOR_BGR2GRAY)
         # Get facial landmarks and position of face on image.
-        vec, point, face_bool = face_op.get_vec(gray)
+        vec, point, face_bool = face_op.get_vec(small_frame)
         if face_bool:
             # Get facial features.
-            feat = facs_helper.facialActions(vec, gray)
+            feat = facs_helper.facialActions(vec, small_frame)
             newFeatures = feat.detectFeatures()
             if not neutralBool:
                 neutralBool, neutralFeatures \

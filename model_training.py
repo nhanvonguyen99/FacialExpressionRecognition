@@ -47,7 +47,6 @@ class FacePrepare:
                 personName = currentPersonName
                 neutralImagePath = f[:11] + "NE" + ".tiff"
                 image = cv2.imread(neutralImagePath)
-                image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
                 vec, center, face_bool = faceUtil.get_vec(image)
                 if face_bool:
                     feat = facs_helper.facialActions(vec, image)
