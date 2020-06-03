@@ -102,12 +102,14 @@ def main():
     lower_face_labels = joblib.load("dataset/lower_face_labels.sav")
     lower_face_features = np.asarray(lower_face_features)
     lower_face_labels = np.asarray(lower_face_labels)
+
     mlb = MultiLabelBinarizer()
     upper_face_labels = mlb.fit_transform(upper_face_labels)
     upper_face_classes = mlb.classes_
     mlb1 = MultiLabelBinarizer()
     lower_face_labels = mlb1.fit_transform(lower_face_labels)
     lower_face_classes = mlb1.classes_
+
     joblib.dump(upper_face_classes, "data_save/upper_face_classes.sav")
     joblib.dump(lower_face_classes, "data_save/lower_face_classes.sav")
 

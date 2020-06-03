@@ -36,33 +36,17 @@ def main():
     # Scale up at the end for viewing.
     scaleUp = 3 / 4
 
-    width = 640
-    height = 480
-    centerFixed = np.array((int(width * scaleFactor / 2), int(height * scaleFactor / 2)))
-
     # Position of text on video when face is detected.
     pos_lower = (np.arange(175, 450, 25) * scaleUp).astype(int)
     pos_upper = (np.arange(25, 175, 25) * scaleUp).astype(int)
     pos_emotion = (np.arange(25, 225, 25) * scaleUp).astype(int)
-    # Counts iterations when face is not found.
-    iter_count = 0
-    # Stores facial features of upper face.
-    groundFeatUpper = []
-    # Stores facial features of lower face.
-    groundFeatLower = []
-    # Stores change in facial features of upper face.
-    facialMotionUpper = []
-    # Stores change in facial features of lower face.
-    facialMotionLower = []
-    # Boolean flag for when neutral expresion is set.
-    # model
     # model path.
     load_file_low = 'model/lower_svm_linear_model.sav'
     load_file_up = 'model/upper_svm_linear_model.sav'
     low_n_classes_path = "data_save/lower_face_classes.sav"
     up_n_classes_path = "data_save/upper_face_classes.sav"
 
-    # Tensorflow model for lower and upper face.
+    # svm model for lower and upper face.
     modelLow = model_helper.modelUtil(load_file_low, low_n_classes_path)
     modelUp = model_helper.modelUtil(load_file_up, up_n_classes_path)
 
