@@ -1,13 +1,19 @@
-from sklearn.svm import SVC
-import numpy as np
 import glob
 import os
+
 import cv2
+import joblib
+import numpy as np
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
+from sklearn.multiclass import OneVsRestClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.preprocessing import MultiLabelBinarizer
+from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
+
 import face_helper
 import facs_helper
-import joblib
-from sklearn.preprocessing import MultiLabelBinarizer
-from sklearn.multiclass import OneVsRestClassifier
 
 facsTop = np.array([1., 2., 4., 5., 6., 7.])
 facsBtm = np.array([9., 10., 12., 15., 16., 20., 23., 24., 25., 26., 27.])
@@ -112,17 +118,75 @@ def main():
 
     joblib.dump(upper_face_classes, "data_save/upper_face_classes.sav")
     joblib.dump(lower_face_classes, "data_save/lower_face_classes.sav")
-
-    subClf = SVC(kernel="linear")
+    X_train, X_test, y_train, y_test = train_test_split(upper_face_features, upper_face_labels, test_size=0.2)
+    X_train1, X_test1, y_train1, y_test1 = train_test_split(lower_face_features, lower_face_labels, test_size=0.2)
+    subClf = SVC(kernel="rbf")
     clf = OneVsRestClassifier(estimator=subClf)
-    clf.fit(lower_face_features, lower_face_labels)
+    clf.fit(X_train, y_train)
+    pred = clf.predict(X_test)
+    print("Accuracy score of SVM for upper facial features:", accuracy_score(y_test, pred))
 
-    subClf1 = SVC(kernel="linear")
+    subClf1 = SVC(kernel="rbf")
     clf1 = OneVsRestClassifier(estimator=subClf1)
-    clf1.fit(upper_face_features, upper_face_labels)
+    clf1.fit(X_train1, y_train1)
+    pred1 = clf1.predict(X_test1)
+    print("Accuracy score of SVM for upper facial features:", accuracy_score(y_test1, pred1))
 
-    joblib.dump(clf, "model/lower_svm_linear_model.sav")
-    joblib.dump(clf1, "model/upper_svm_linear_model.sav")
+    subClf2 = GaussianNB()
+    clf2 = OneVsRestClassifier(estimator=subClf2)
+    clf2.fit(X_train, y_train)
+    pred2 = clf2.predict(X_test)
+    print("Accuracy score of Naive bayes for upper facial features:", accuracy_score(y_test, pred2))
+
+    subClf3 = GaussianNB()
+    clf3 = OneVsRestClassifier(estimator=subClf3)
+    clf3.fit(X_train1, y_train1)
+    pred3 = clf3.predict(X_test1)
+    print("Accuracy score of Naive bayes for upper facial features:", accuracy_score(y_test1, pred3))
+
+    subClf4 = DecisionTreeClassifier()
+    clf4 = OneVsRestClassifier(estimator=subClf4)
+    clf4.fit(X_train, y_train)
+    pred4 = clf4.predict(X_test)
+    print("Accuracy score of Tree for upper facial features:", accuracy_score(y_test, pred4))
+
+    subClf5 = DecisionTreeClassifier()
+    clf5 = OneVsRestClassifier(estimator=subClf5)
+    clf5.fit(X_train1, y_train1)
+    pred5 = clf5.predict(X_test1)
+    print("Accuracy score of Tree for upper facial features:", accuracy_score(y_test1, pred5))
+    print("\n\n")
+
+    subClf = SVC(kernel="rbf")
+    clf = OneVsRestClassifier(estimator=subClf)
+    clf.fit(upper_face_features, upper_face_labels)
+
+    subClf1 = SVC(kernel="rbf")
+    clf1 = OneVsRestClassifier(estimator=subClf1)
+    clf1.fit(lower_face_features, lower_face_labels)
+
+    subClf2 = GaussianNB()
+    clf2 = OneVsRestClassifier(estimator=subClf2)
+    clf2.fit(upper_face_features, upper_face_labels)
+
+    subClf3 = GaussianNB()
+    clf3 = OneVsRestClassifier(estimator=subClf3)
+    clf3.fit(lower_face_features, lower_face_labels)
+
+    subClf4 = DecisionTreeClassifier()
+    clf4 = OneVsRestClassifier(estimator=subClf4)
+    clf4.fit(upper_face_features, upper_face_labels)
+
+    subClf5 = DecisionTreeClassifier()
+    clf5 = OneVsRestClassifier(estimator=subClf5)
+    clf5.fit(lower_face_features, lower_face_labels)
+
+    joblib.dump(clf1, "model/lower_svm_linear_model.sav")
+    joblib.dump(clf, "model/upper_svm_linear_model.sav")
+    joblib.dump(clf3, "model/lower_naive_bayes_model.sav")
+    joblib.dump(clf2, "model/upper_naive_bayes_model.sav")
+    joblib.dump(clf5, "model/lower_tree_model.sav")
+    joblib.dump(clf4, "model/upper_tree_model.sav")
 
 
 if __name__ == "__main__":
