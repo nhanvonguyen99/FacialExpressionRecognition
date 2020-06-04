@@ -106,6 +106,27 @@ The remaining emotions are difficult to recognizes.
 
 ![Anger emotion](./Image/Anger.png)
 
+## Requirements
+
+- Python (>= 3.3)
+- Opencv (python3-version) [Installation](http://docs.opencv.org/master/da/df6/tutorial_py_table_of_contents_setup.html)
+- Dlib
+- Imutils
+- Sklearn
+
+## Usage
+###### Demo
+```shell script
+python3 main.py
+```
+
+If you just want to run this demo instead of training the model from scaratch, the following content can be skipped.
+
+###### Train models
+```shell script
+python3 model_training.py
+```
+
 ## Limitations
 - System can recognize 6 basic emotions while human emotions are diverse.
 - Depends on clear expression of humans.
