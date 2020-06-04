@@ -1,15 +1,19 @@
 # FACIAL ACTION TRACKING
 ## Introduction
+
 Facial action tracking is a system that tracks movements of human face, which
 uses actions units (AUs) to follow differences between face muscles. It is one of the
 technique used to detect human emotions in real-time.
+
 ## Dataset
+
 The Japanese Female Facial Expression (JAFFEE) database: The database
 contains 213 images of 7 facial expressions (6 basic facial expressions + 1 neutral) po sed
 by 10 Japanese female models. Each image has been rated on 6 emotion adjectives by 60
 Japanese subjects. This database contains only posed expressions. The photos have been
 taken under strict controlled conditions of similar lighting and with the hair tied away
 from the face
+
 ![JAFFE sample](./Image/Sample-images-of-the-JAFFE-database.ppm)
 
 ## Methodology
@@ -24,6 +28,7 @@ The system follows five steps:
 ### Facial landmarks detection
 
 ![Facial landmarks](./Image/FacialLandmarks.png)
+
 Examining the image, we can see that facial regions can be accessed via simple
 Python indexing (assuming zero-indexing with Python since the image above is o ne-
 indexed):
@@ -38,12 +43,19 @@ indexed):
 ### Facial features detection
 
 - Upper facial features detection
+
 ![Upper Facial Features](./Image/UpperFacialFeatures.jpg)
+
 ![Upper Features](./Image/UpperFeatures.png)
+
 - Lower facial features detection
+
 ![Lower Facial Features](./Image/LowerFacialFeatures.jpg)
+
 ![Lower Features](./Image/LowerFeatures.png)
+
 ### Facial motion tracking
+
 Motion of upper facial features comparing between new frame and old frame:
 - Change in Distance between eyebrows.
 - Change in height between outer corner of left eye and outer left eyebrow, of
@@ -83,11 +95,15 @@ corresponding AUs as labels.
 
 ### Evaluate
 The model only recognizes the lower Aus. Therefore the model only recognizes surprise, sad emotions.
+
 ![Sad emotion](./Image/Sad.png)
+
 ![Surprise emotion](./Image/Surprise.png)
 
 The remaining emotions are difficult to recognizes.
+
 ![Happiness emotion](./Image/Happiness.png)
+
 ![Anger emotion](./Image/Anger.png)
 
 ## Limitations
