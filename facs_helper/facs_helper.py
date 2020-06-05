@@ -232,7 +232,8 @@ class facialActions:
         r_top = - (new[28] - old[28]) / old[28]  # top lip height to nose
         r_btm = - (new[29] - old[29]) / old[29]  # bottom lip height to nose
 
-        return D_brow, r_blo, r_bli, r_bro, r_bri, r_hl1, r_hr1, r_hl2, r_hr2, r_el, r_er, r_h, r_w, r_ell, r_r, r_top, r_btm
+        return D_brow, r_bri, r_hl1, r_hr2, r_er, r_w, r_r
+        #       1       0       0       0       1   1       0       0       1   0       1   0   1       0     1     0       0
 
     def checkProfile(self, tol):
         """Check that face is looking straight-on at camera.

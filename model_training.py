@@ -9,6 +9,8 @@ import joblib
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.naive_bayes import GaussianNB
 import argparse
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 
 
 def get_emotion(filename):
@@ -43,24 +45,24 @@ class FacePrepare:
             print("Processing file: {}".format(f))
             currentPersonName = f.replace("dataset/", "")[:2]
             emotion = get_emotion(f.replace("dataset/", ""))
-            if personName == "None" or personName != currentPersonName:
-                personName = currentPersonName
-                neutralImagePath = f[:11] + "NE" + ".tiff"
-                image = cv2.imread(neutralImagePath)
+            if emotion != 0:
+                if personName == "None" or personName != currentPersonName:
+                    personName = currentPersonName
+                    neutralImagePath = f[:11] + "NE" + ".tiff"
+                    image = cv2.imread(neutralImagePath, 0)
+                    vec, center, face_bool = faceUtil.get_vec(image)
+                    if face_bool:
+                        feat = facs_helper.facialActions(vec, image)
+                        neutralFeatures = feat.detectFeatures()
+
+                image = cv2.imread(f, 0)
                 vec, center, face_bool = faceUtil.get_vec(image)
                 if face_bool:
                     feat = facs_helper.facialActions(vec, image)
-                    neutralFeatures = feat.detectFeatures()
-
-            image = cv2.imread(f)
-            image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-            vec, center, face_bool = faceUtil.get_vec(image)
-            if face_bool:
-                feat = facs_helper.facialActions(vec, image)
-                newFeatures = feat.detectFeatures()
-                facialMotion = np.asarray(feat.FaceFeatures(neutralFeatures, newFeatures)).tolist()
-                self.images.append(facialMotion)
-                self.labels.append(emotion)
+                    newFeatures = feat.detectFeatures()
+                    facialMotion = np.asarray(feat.FaceFeatures(neutralFeatures, newFeatures)).tolist()
+                    self.images.append(facialMotion)
+                    self.labels.append(emotion)
 
         return self.images, self.labels
 
@@ -89,8 +91,46 @@ def main():
             joblib.dump(images, "data_save/images.sav")
             joblib.dump(labels, "data_save/labels.sav")
 
+    # import itertools
+    # maxAccuracy = 0
+    # target = 0
+    # for i in range(1, 2 ** len(images[0])):
+    #     images_temp = []
+    #     for j in range(len(images)):
+    #         subset = []
+    #         for k in range(len(images[j])):
+    #             if (i & 1 << k) > 0:
+    #                 subset.append(images[j][k])
+    #         images_temp.append(subset)
+    #     X_train, X_test, y_train, y_test = train_test_split(images_temp, labels, test_size=0.2, random_state=2)
+    #     if modelName == 0:
+    #         model = SVC(kernel="rbf")
+    #         path = "model/svm_linear_model.sav"
+    #     elif modelName == 1:
+    #         model = GaussianNB()
+    #         path = "model/gaussian_naive_bayes_model.sav"
+    #     else:
+    #         model = DecisionTreeClassifier()
+    #         path = "model/decision_tree_model.sav"
+    #
+    #     model.fit(X_train, y_train)
+    #     pred = model.predict(X_test)
+    #     accuracy = accuracy_score(y_test, pred)
+    #     if accuracy > maxAccuracy:
+    #         maxAccuracy = accuracy
+    #         target = i
+    # images_temp = []
+    # # print(maxAccuracy, target)
+    # for i in range(len(images)):
+    #     subsets = []
+    #     for k in range(len(images[i])):
+    #         if (21809 & 1 << k) > 0:
+    #             subsets.append(images[i][k])
+    #     images_temp.append(subsets)
+
+    X_train, X_test, y_train, y_test = train_test_split(images, labels, test_size=0.2, random_state=2)
     if modelName == 0:
-        model = SVC(kernel="linear")
+        model = SVC(kernel="rbf")
         path = "model/svm_linear_model.sav"
     elif modelName == 1:
         model = GaussianNB()
@@ -99,6 +139,10 @@ def main():
         model = DecisionTreeClassifier()
         path = "model/decision_tree_model.sav"
 
+    model.fit(X_train, y_train)
+    pred = model.predict(X_test)
+    accuracy = accuracy_score(y_test, pred)
+    print(accuracy)
     model.fit(images, labels)
     joblib.dump(model, path)
     print("Model is saved at ", path)

@@ -4,6 +4,7 @@ neutral expression."""
 import cv2
 import dlib
 import numpy as np
+import local_binary_pattern
 
 
 class faceUtil:
@@ -17,12 +18,13 @@ class faceUtil:
         neutralFeatures (float): Neutral facial features of face.
     """
 
-    def __init__(self):
-        self.predictor_path = './face_helper/shape_predictor_68_face_landmarks.dat'
+    def __init__(self, predictor_path="./face_helper/shape_predictor_68_face_landmarks.dat"):
+        self.predictor_path = predictor_path
         self.detector = dlib.get_frontal_face_detector()
         self.predictor = dlib.shape_predictor(self.predictor_path)
         self.vec = np.empty([68, 2], dtype=int)
         self.neutralFeatures = []
+        self.lbp = local_binary_pattern.LocalBinaryPattern(24, 8)
 
     def get_vec(self, image):
         """Get facial landmarks of face.
@@ -31,6 +33,9 @@ class faceUtil:
             vec (int): 68 landmarks of face.
             center (int): Coordinates of center of face.
             face_bool (bool): True if face detected. Otherwise, false."""
+
+        # closing all open windows
+        cv2.destroyAllWindows()
         detector = self.detector(image, 1)  # detector includes rectangle coordinates of face
         center = []  # Center coordinates of face.
         if np.any(detector):
