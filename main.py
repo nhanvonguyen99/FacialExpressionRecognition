@@ -1,14 +1,17 @@
+import argparse
 import time
+
 import cv2
+import joblib
 import numpy as np
+from imutils.video import VideoStream
+
 import face_helper
 import facs_helper
-from imutils.video import VideoStream
-import joblib
-import argparse
 
 
 def main():
+    global neutralFeatures
     ap = argparse.ArgumentParser()
 
     ap.add_argument("-m", "--model", type=int, default=0,
@@ -17,8 +20,6 @@ def main():
     args = vars(ap.parse_args())
 
     # Label Facial Action Units (AUs) and Basic Emotions.
-    global neutralFeatures
-
     dict_emotion = ["Thinking...", "Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise"]
 
     # Font size for text on video
@@ -28,7 +29,7 @@ def main():
     # Initialize Dlib
     face_op = face_helper.faceUtil()
 
-    tol = 5 # Tolerance for setting neutral expression profile. Verifies eye and ear separation
+    tol = 5  # Tolerance for setting neutral expression profile. Verifies eye and ear separation
 
     # Reduces images size for image processing.
     scaleFactor = 0.4
@@ -54,6 +55,7 @@ def main():
     # initialize the video stream and allow the camera sensor to warn up
     print("[INFO] camera sensor warming up...")
     vs = VideoStream(usePiCamera=False).start()
+
     time.sleep(5.0)
     neutralBool = False
 
@@ -83,7 +85,6 @@ def main():
 
         cv2.putText(big_frame, dict_emotion[emotion], (380, pos_emotion[emotion]), font, font_size, (255, 0, 0), 2,
                     cv2.LINE_AA)
-
         cv2.imshow("Frame", big_frame)
         key = cv2.waitKey(1) & 0xFF
 

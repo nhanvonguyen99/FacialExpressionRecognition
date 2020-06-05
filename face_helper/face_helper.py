@@ -34,8 +34,6 @@ class faceUtil:
             center (int): Coordinates of center of face.
             face_bool (bool): True if face detected. Otherwise, false."""
 
-        # closing all open windows
-        cv2.destroyAllWindows()
         detector = self.detector(image, 1)  # detector includes rectangle coordinates of face
         center = []  # Center coordinates of face.
         if np.any(detector):
