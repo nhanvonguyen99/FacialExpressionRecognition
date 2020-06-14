@@ -1,11 +1,9 @@
 import argparse
 import time
-
 import cv2
-import joblib
 import numpy as np
 from imutils.video import VideoStream
-
+from tensorflow import keras
 import face_helper
 import facs_helper
 
@@ -40,17 +38,7 @@ def main():
     # Position of text on video when face is detected.
     pos_emotion = (np.arange(25, 225, 25) * scaleUp).astype(int)
 
-    # SVM model path.
-    model_selection = args["model"]
-    if model_selection == 0:
-        load_file = 'model/svm_linear_model.sav'
-    elif model_selection == 1:
-        load_file = "model/gaussian_naive_bayes_model.sav"
-    else:
-        load_file = "model/decision_tree_model.sav"
-
-    # model
-    model = joblib.load(load_file)
+    model = keras.models.load_model("model/dnn")
 
     # initialize the video stream and allow the camera sensor to warn up
     print("[INFO] camera sensor warming up...")
@@ -75,7 +63,8 @@ def main():
                     = face_op.set_neutral(feat, newFeatures, neutralBool, tol)
             else:
                 facialMotion = np.asarray(feat.FaceFeatures(neutralFeatures, newFeatures)).tolist()
-                emotion = model.predict([facialMotion])[0]
+                predict_single = model.predict([facialMotion])
+                emotion = np.argmax(predict_single[0])
 
         # Increase size of frame for viewing.
         big_frame = cv2.resize(small_frame, (0, 0), fx=scaleUp * 1 / scaleFactor, fy=scaleUp * 1 / scaleFactor)

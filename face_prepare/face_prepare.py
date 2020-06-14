@@ -2,7 +2,6 @@ import glob
 import os
 import numpy as np
 import cv2
-
 from face_helper import faceUtil
 from facs_helper import facialActions
 
@@ -48,6 +47,7 @@ class FacePrepare:
 
     def process(self):
         for f in glob.glob(os.path.join(self.__faceFolder, "*.tiff")):
+            print("Processing file: {0}".format(f))
             personName = f[8:10]
             emotion = self.filename2emotion(f)
             neutralFeatures = self.__neutralFeatures[personName]
@@ -56,7 +56,7 @@ class FacePrepare:
             if faceBool:
                 feat = facialActions(vec, image)
                 newFeatures = feat.detectFeatures()
-                facialMotion = np.asarray(feat.FaceFeatures(neutralFeatures, newFeatures)).tolist()
+                facialMotion = np.asarray(feat.FaceFeatures(neutralFeatures, newFeatures), dtype="float64").tolist()
                 self.images_.append(facialMotion)
                 self.labels_.append(emotion)
 
