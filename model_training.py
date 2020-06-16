@@ -2,60 +2,52 @@ import joblib
 import argparse
 from sklearn.model_selection import train_test_split
 from face_prepare import FacePrepare
-import tensorflow as tf
-from tensorflow import keras
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score
+from sklearn.naive_bayes import GaussianNB
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from os import path
 
 
 def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("-l", "--load-data", type=bool, default=False,
-                    help="True if load data from file, False if training data from dataset")
-    ap.add_argument("-s", "--save-dataset", type=bool, default=True,
-                    help="True if you want to save data to file")
+    # if path.exists("data_save/images.sav") and path.exists("data_save/labels.sav"):
+    #     images = joblib.load("data_save/images.sav")
+    #     labels = joblib.load("data_save/labels.sav")
+    # else:
+    facePrepare = FacePrepare()
+    images, labels = facePrepare.process()
+    # joblib.dump(images, "data_save/images.sav")
+    # joblib.dump(labels, "data_save/labels.sav")
 
-    args = vars(ap.parse_args())
-
-    loadData = args["load_data"]
-    if loadData:
-        images = joblib.load("data_save/images_temp.sav")
-        labels = joblib.load("data_save/labels_temp.sav")
-    else:
-        faceFolder = FacePrepare()
-        images, labels = faceFolder.process()
-        saveData = args["save_dataset"]
-        if saveData:
-            joblib.dump(images, "data_save/images_temp.sav")
-            joblib.dump(labels, "data_save/labels_temp.sav")
-
-    X_train, X_test, y_train, y_test = train_test_split(images, labels, test_size=0.2, random_state=2)
-    #  print(len(X_train[0]))
-    model = keras.Sequential([
-        keras.layers.Flatten(input_shape=(len(images[0]),)),
-        keras.layers.Dense(128, activation="relu"),
-        keras.layers.Dropout(0.2),
-        keras.layers.Dense(128, activation="relu"),
-        keras.layers.Dropout(0.2),
-        keras.layers.Dense(128, activation="relu"),
-        keras.layers.Dropout(0.2),
-        keras.layers.Dense(128, activation="relu"),
-        keras.layers.Dropout(0.2),
-        keras.layers.Dense(128, activation="relu"),
-        keras.layers.Dropout(0.2),
-        keras.layers.Dense(7)
-    ])
-
-    model.compile(optimizer='adam',
-                  loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                  metrics=['accuracy'])
-
-    model.fit(X_train, y_train, epochs=1000)
-
-    test_loss, test_acc = model.evaluate(X_test, y_test, verbose=2)
-
-    print('\nTest accuracy:', test_acc)
-
-    model.fit(images, labels, epochs=1000)
-    model.save("model/dnn")
+    # X_train, X_test, y_train, y_test = train_test_split(images, labels, test_size=0.2, random_state=2)
+    # model = SVC(kernel="rbf", C=8.5)
+    # model.fit(X_train, y_train)
+    # pred = model.predict(X_test)
+    # print("SVM:", accuracy_score(y_test, pred))
+    #
+    # model = GaussianNB()
+    # model.fit(X_train, y_train)
+    # pred = model.predict(X_test)
+    # print("Naive bayes:", accuracy_score(y_test, pred))
+    #
+    # model = DecisionTreeClassifier()
+    # model.fit(X_train, y_train)
+    # pred = model.predict(X_test)
+    # print("Decision tree:", accuracy_score(y_test, pred))
+    #
+    # model = RandomForestClassifier()
+    # model.fit(X_train, y_train)
+    # pred = model.predict(X_test)
+    # print("Random forest:", accuracy_score(y_test, pred))
+    #
+    # model_save = SVC(kernel="rbf")
+    # model_save.fit(images, labels)
+    # joblib.dump(model_save, "model/svm_rbf_model.sav")
+    facePrepare.process_features_selection("SVC")
+    facePrepare.process_features_selection("GaussianNB")
+    facePrepare.process_features_selection("DecisionTreeClassifier")
+    facePrepare.process_features_selection("RandomForestClassifier")
 
 
 if __name__ == "__main__":

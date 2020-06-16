@@ -2,8 +2,14 @@ import glob
 import os
 import numpy as np
 import cv2
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
 from face_helper import faceUtil
 from facs_helper import facialActions
+from sklearn.naive_bayes import GaussianNB
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
 
 
 class FacePrepare:
@@ -61,3 +67,34 @@ class FacePrepare:
                 self.labels_.append(emotion)
 
         return self.images_, self.labels_
+
+    def process_features_selection(self, modelName="SVC"):
+        maxAccuracy = 0
+        target = 0
+        for i in range(1, 2 ** len(self.images_[0])):
+            images_temp = []
+            for j in range(len(self.images_)):
+                subset = []
+                for k in range(len(self.images_[j])):
+                    if (i & 1 << k) > 0:
+                        subset.append(self.images_[j][k])
+                images_temp.append(subset)
+            X_train, X_test, y_train, y_test = train_test_split(images_temp, self.labels_, test_size=0.2,
+                                                                random_state=2)
+            if modelName == "SVC":
+                model = SVC()
+            elif modelName == "GaussianNB":
+                model = GaussianNB()
+            elif modelName == "DecisionTreeClassifier":
+                model = DecisionTreeClassifier()
+            else:
+                model = RandomForestClassifier()
+
+            model.fit(X_train, y_train)
+            pred = model.predict(X_test)
+            accuracy = accuracy_score(y_test, pred)
+            if accuracy > maxAccuracy:
+                maxAccuracy = accuracy
+                target = i
+        print(modelName, maxAccuracy, target)
+        return target

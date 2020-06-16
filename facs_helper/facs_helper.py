@@ -232,19 +232,19 @@ class facialActions:
         r_top = - (new[28] - old[28]) / old[28]  # top lip height to nose
         r_btm = - (new[29] - old[29]) / old[29]  # bottom lip height to nose
 
-        return D_brow, r_blo, r_bli, r_bro, r_bri, r_hl1, r_hl2, r_hr1, r_hr2, r_el, r_er, \
+        return D_brow, r_blo, r_bli, r_bro, r_bri, r_hl1, r_hr1, r_hl2, r_hr2, r_el, r_er, \
                r_h, r_w, r_ell, r_r, r_top, r_btm
-        #       1       0       0       0       1   1       0       0       1   0       1   0   1       0     1     0       0
+        # return D_brow, r_bli, r_bro, r_hl1, r_hr2, r_el, r_w, r_ell, r_r, r_top, r_btm
 
     def checkProfile(self, tol):
         """Check that face is looking straight-on at camera.
-        
+
         Check that left jaw is approximately equal to right jaw. Check that distance from eye
         to nose is approximately equal for left and right side.
-        
+
         Args:
-            tol (int): Tolerance for how much left side can differ from right side. 
-            
+            tol (int): Tolerance for how much left side can differ from right side.
+
         Returns:
             jawBool (bool): True if left and right jaw are the same within tolerance. False otherwise.
             eyeBool (bool):True if left and right jaw are the same within tolerance. False otherwise.
