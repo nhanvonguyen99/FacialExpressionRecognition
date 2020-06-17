@@ -85,10 +85,8 @@ class FacePrepare:
                 model = SVC()
             elif modelName == "GaussianNB":
                 model = GaussianNB()
-            elif modelName == "DecisionTreeClassifier":
-                model = DecisionTreeClassifier()
             else:
-                model = RandomForestClassifier()
+                model = DecisionTreeClassifier()
 
             model.fit(X_train, y_train)
             pred = model.predict(X_test)

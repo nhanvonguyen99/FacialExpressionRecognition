@@ -44,16 +44,19 @@ def main():
     print("[INFO] camera sensor warming up...")
     vs = VideoStream(usePiCamera=False).start()
 
-    time.sleep(5.0)
+    time.sleep(2.0)
     neutralBool = False
 
-    emotion = 6
+    emotion = 0
+    emotions = []
+    frame_index = 0
     # loop over the frames from the video stream
     while True:
         frame = vs.read()
         small_frame = cv2.resize(frame, (256, 256))
         # Get facial landmarks and position of face on image.
         vec, point, face_bool = face_op.get_vec(small_frame)
+
         if face_bool:
             # Get facial features.
             feat = facs_helper.facialActions(vec, small_frame)
@@ -64,7 +67,13 @@ def main():
             else:
                 facialMotion = np.asarray(feat.FaceFeatures(neutralFeatures, newFeatures), dtype="float64").tolist()
                 predict_single = model.predict([facialMotion])
-                emotion = predict_single[0]
+                emotions.append(predict_single[0])
+                frame_index = frame_index + 1
+
+        if frame_index > 5:
+            emotion = max(set(emotions), key=emotions.count)
+            frame_index = 0
+            emotions = []
 
         # Increase size of frame for viewing.
         big_frame = cv2.resize(small_frame, (0, 0), fx=scaleUp * 1 / scaleFactor, fy=scaleUp * 1 / scaleFactor)
