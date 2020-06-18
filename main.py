@@ -48,12 +48,10 @@ def main():
     neutralBool = False
 
     emotion = 0
-    emotions = []
-    frame_index = 0
     # loop over the frames from the video stream
     while True:
         frame = vs.read()
-        small_frame = cv2.resize(frame, (256, 256))
+        small_frame = cv2.resize(frame, (0, 0), fx=scaleFactor, fy=scaleFactor)
         # Get facial landmarks and position of face on image.
         vec, point, face_bool = face_op.get_vec(small_frame)
 
@@ -67,13 +65,7 @@ def main():
             else:
                 facialMotion = np.asarray(feat.FaceFeatures(neutralFeatures, newFeatures), dtype="float64").tolist()
                 predict_single = model.predict([facialMotion])
-                emotions.append(predict_single[0])
-                frame_index = frame_index + 1
-
-        if frame_index > 5:
-            emotion = max(set(emotions), key=emotions.count)
-            frame_index = 0
-            emotions = []
+                emotion = predict_single[0]
 
         # Increase size of frame for viewing.
         big_frame = cv2.resize(small_frame, (0, 0), fx=scaleUp * 1 / scaleFactor, fy=scaleUp * 1 / scaleFactor)
