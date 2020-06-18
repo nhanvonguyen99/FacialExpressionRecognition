@@ -1,13 +1,11 @@
-import joblib
-import argparse
-from sklearn.model_selection import train_test_split
-from face_prepare import FacePrepare
-from sklearn.svm import SVC
-from sklearn.metrics import accuracy_score
-from sklearn.naive_bayes import GaussianNB
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier
 from os import path
+
+import joblib
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
+
+from face_prepare import FacePrepare
 
 
 def main():

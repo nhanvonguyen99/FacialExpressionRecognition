@@ -3,8 +3,8 @@ neutral expression."""
 
 import cv2
 import dlib
-import numpy as np
 import local_binary_pattern
+import numpy as np
 
 
 class faceUtil:

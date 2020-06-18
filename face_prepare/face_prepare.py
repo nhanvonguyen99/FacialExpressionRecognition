@@ -1,15 +1,16 @@
 import glob
 import os
-import numpy as np
+
 import cv2
+import numpy as np
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
+
 from face_helper import faceUtil
 from facs_helper import facialActions
-from sklearn.naive_bayes import GaussianNB
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier
 
 
 class FacePrepare:
