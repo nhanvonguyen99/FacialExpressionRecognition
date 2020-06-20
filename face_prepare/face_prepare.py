@@ -14,7 +14,7 @@ from facs_helper import facialActions
 
 
 class FacePrepare:
-    def __init__(self, faceFolder="dataset"):
+    def __init__(self, faceFolder="dataset/jaffedbase/jaffedbase"):
         self.__faceFolder = faceFolder
         self.__faceUtil = faceUtil()
         self.__neutralFeatures = {}
@@ -25,7 +25,7 @@ class FacePrepare:
 
     def __get_neural_feature(self):
         for f in glob.glob(os.path.join(self.__faceFolder, "*.tiff")):
-            personName = f[8:10]
+            personName = f[30:32]
             if personName not in self.__neutralFeatures.keys():
                 neuralImagePath = glob.glob(os.path.join(self.__faceFolder, "{0}.NE*.tiff".format(personName)))[0]
                 image = cv2.imread(neuralImagePath)
@@ -37,7 +37,7 @@ class FacePrepare:
 
     @staticmethod
     def filename2emotion(filename):
-        emotion = filename[11:13]
+        emotion = filename[33:35]
         if emotion == "AN":
             return 1
         elif emotion == "DI":
@@ -55,7 +55,7 @@ class FacePrepare:
     def process(self):
         for f in glob.glob(os.path.join(self.__faceFolder, "*.tiff")):
             print("Processing file: {0}".format(f))
-            personName = f[8:10]
+            personName = f[30:32]
             emotion = self.filename2emotion(f)
             neutralFeatures = self.__neutralFeatures[personName]
             image = cv2.imread(f)
