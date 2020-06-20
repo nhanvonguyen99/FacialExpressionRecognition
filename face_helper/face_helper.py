@@ -3,7 +3,6 @@ neutral expression."""
 
 import cv2
 import dlib
-import local_binary_pattern
 import numpy as np
 
 
@@ -24,7 +23,6 @@ class faceUtil:
         self.predictor = dlib.shape_predictor(self.predictor_path)
         self.vec = np.empty([68, 2], dtype=int)
         self.neutralFeatures = []
-        self.lbp = local_binary_pattern.LocalBinaryPattern(24, 8)
 
     def get_vec(self, image):
         """Get facial landmarks of face.

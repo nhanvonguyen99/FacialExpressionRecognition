@@ -23,7 +23,7 @@ def main():
     pred = model.predict(X_test)
     print("SVM:", accuracy_score(y_test, pred))
 
-    model_save = SVC(kernel="rbf")
+    model_save = SVC(kernel="rbf", C=2.7)
     model_save.fit(images, labels)
     joblib.dump(model_save, "model/svm_rbf_model.sav")
 
