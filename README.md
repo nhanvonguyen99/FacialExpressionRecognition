@@ -28,6 +28,8 @@ python3 model_training.py
 ## Dataset
 I have used [this](https://zenodo.org/record/3451524) dataset
 
+Download JAFFE database and unzip it to dataset folder.
+
 ## Evaluate
 
 |Model|Accuracy|
