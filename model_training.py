@@ -23,7 +23,20 @@ def main():
     pred = model.predict(X_test)
     print("SVM:", accuracy_score(y_test, pred))
 
-    model_save = SVC(kernel="rbf", C=2.7)
+    from sklearn.metrics import plot_confusion_matrix
+    import matplotlib.pyplot as plt
+
+    # Plot non-normalized confusion matrix
+
+    class_names = ["Neutral", "Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise"]
+
+    dist = plot_confusion_matrix(model, X_test, y_test,
+                                 cmap=plt.cm.Blues,
+                                 display_labels=class_names, normalize="true")
+    dist.ax_.set_title("Expression Classes - Recognition Rate")
+
+    plt.show()
+    model_save = SVC(kernel="rbf", C=2.3)
     model_save.fit(images, labels)
     joblib.dump(model_save, "model/svm_rbf_model.sav")
 
